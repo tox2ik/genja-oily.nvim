@@ -1,0 +1,67 @@
+*genja-oily.txt*	Hide oil.nvim entries listed in a .oily file
+
+==============================================================================
+CONTENTS                                                          *genja-oily*
+
+    Lookup ................................ |genja-oily-lookup|
+    Rules ................................. |genja-oily-rules|
+    Setup ................................. |genja-oily-setup|
+    API ................................... |genja-oily-api|
+
+==============================================================================
+LOOKUP                                                     *genja-oily-lookup*
+
+Each time oil shows a directory, genja-oily looks for ".oily" in it, then in
+its parents up to the filesystem root, and stops at the first one found. Its
+rules apply to the directory it sits in and everything below. A closer .oily
+replaces one further up; rules don't stack.
+
+==============================================================================
+RULES                                                       *genja-oily-rules*
+
+One per line. Blank lines and "#" comments are ignored, a trailing "/" is
+dropped.
+
+    node_modules        bare name: hidden in every directory below
+    lua/lazyp/unused    path relative to the .oily dir: hides that entry
+    C:/tmp/scratch      absolute path: hides that entry
+    *.log               bare glob: matched against names
+    lua/**/zold*        glob with "/": matched against the path relative to
+                        the .oily dir
+    C:/tmp/*.bak        absolute glob: matched against the absolute path
+
+Globs use |vim.glob| syntax and must match the whole name or path. Matching
+ignores case on Windows. A .oily is re-read when its mtime changes.
+
+==============================================================================
+SETUP                                                       *genja-oily-setup*
+>lua
+    require('genja-oily').setup({
+        filename = '.oily',   -- name of the rules file
+        hide_dotfiles = true, -- hide names starting with '.' (oil's default)
+    })
+
+    require('oil').setup({
+        view_options = {
+            is_hidden_file = function(name, bufnr)
+                return require('genja-oily').is_hidden_file(name, bufnr)
+            end,
+        },
+    })
+<
+==============================================================================
+API                                                           *genja-oily-api*
+
+is_hidden_file({name}, {bufnr})                   *genja-oily.is_hidden_file()*
+    For oil's view_options.is_hidden_file.
+
+hide()                                                     *genja-oily.hide()*
+    Append the oil entry under the cursor, or the linewise-visual lines, to
+    the .oily that applies (path relative to it, absolute when outside). With
+    none up the tree: creates one in |:pwd| when oil's directory is inside
+    it, else in oil's directory. Re-renders oil.
+
+find({dir})                                                *genja-oily.find()*
+    Path of the .oily that applies to {dir}, or nil.
+
+ vim:tw=78:ts=8:sw=4:et:ft=help:norl:
