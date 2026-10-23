@@ -10,6 +10,8 @@
 --   # comment
 -- Globs use vim.glob syntax (* ? ** [abc] {a,b}) and must match the whole name/path.
 
+local SRC = 'genja-oily/init.lua: '
+
 local M = {}
 
 ---@class genja-oily.Opts
@@ -102,7 +104,7 @@ local function read_rules(file)
 			if has_glob(line) then
 				local ok, glob = pcall(vim.glob.to_lpeg, key(line))
 				if not ok then
-					vim.notify('genja-oily: bad glob in ' .. file .. ':' .. lnum .. ': ' .. line, vim.log.levels.WARN)
+					vim.notify(SRC .. 'bad glob in ' .. file .. ':' .. lnum .. ': ' .. line, vim.log.levels.WARN)
 				elseif is_absolute then
 					table.insert(rules.abs_globs, glob)
 				elseif is_path then
@@ -234,7 +236,7 @@ function M.hide()
 	end
 	vim.fn.writefile(lines, file, 'a') -- creates the file if needed
 	lookup_cache = {} -- a new file may apply to dirs searched a moment ago
-	vim.notify('genja-oily: hidden via ' .. file .. ': ' .. table.concat(lines, ' '))
+	vim.notify(SRC .. 'hidden via ' .. file .. ': ' .. table.concat(lines, ' '))
 	require('oil').set_is_hidden_file(M.is_hidden_file) -- re-render with the new rules
 end
 
