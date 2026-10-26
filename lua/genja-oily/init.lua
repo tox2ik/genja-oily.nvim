@@ -72,10 +72,7 @@ function M.find(dir)
 		cached = { file = found or false, at = now }
 		lookup_cache[dir_key] = cached
 	end
-	if cached.file == false then
-		return nil
-	end
-	return cached.file
+	return cached.file or nil
 end
 
 ---Parsed `file`, re-read when its mtime changes; nil when it is gone.
@@ -176,12 +173,11 @@ end
 ---Saved entries on the cursor line, or on the visual lines (leaves visual mode).
 ---@return string[] names
 local function entry_names()
-	local first = vim.fn.line('.')
-	local last = first
-	local visual = vim.fn.mode() == 'V'
+	local first, last = vim.fn.line('.'), vim.fn.line('.')
+	local visual = (vim.fn.mode() == 'V')
 	if visual then
-		first = math.min(vim.fn.line('v'), vim.fn.line('.'))
-		last = math.max(vim.fn.line('v'), vim.fn.line('.'))
+		first = math.min(vim.fn.line('v'), last)
+		last = math.max(vim.fn.line('v'), last)
 	end
 	local names = {}
 	for lnum = first, last do
