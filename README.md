@@ -36,7 +36,7 @@ C:/tmp/*.bak         absolute glob: matched against the absolute path
 
 ```lua
 {
-	'USERNAME/genja-oily.nvim',
+	'tox2ik/genja-oily.nvim',
 	dependencies = { 'stevearc/oil.nvim' },
 	opts = {
 		filename = '.oily',   -- name of the rules file
